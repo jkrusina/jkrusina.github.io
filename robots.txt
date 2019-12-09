@@ -1,0 +1,4 @@
+Sitemap: http://jkrusina.github.io/sitemapindex.xml
+
+User-Agent: *
+Host: jkrusina.github.io

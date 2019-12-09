@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Just a random personal blog about machine learning</title><link>http://jkrusina.github.io/</link><description>Just a random personal blog about machine learning.</description><atom:link href="http://jkrusina.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2019 &lt;a href="mailto:xkrusina@gmail.com"&gt;Jan Krusina&lt;/a&gt; </copyright><lastBuildDate>Mon, 09 Dec 2019 19:10:25 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Predicting soccer matches outcomes with machine learning as time series</title><link>http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/</link><dc:creator>Jan Krusina</dc:creator><description>&lt;div&gt;&lt;h2&gt;Table of contents&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#introduction"&gt;Introduction&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;1.2 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#framingtheproblem"&gt;Framing the problem&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;1.3 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#whatwearedealingwith"&gt;What we are dealing with&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#technicalwalkthrough"&gt;Technical walkthrough&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;2.1 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#dataset"&gt;Dataset&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;2.2 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#features"&gt;Features&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;2.3 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#architecture"&gt;Architecture&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;2.4 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#training"&gt;Training&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;2.5 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#pickingateam"&gt;Picking a team&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#results"&gt;Testing and results&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;3.1 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase1"&gt;Test case #1 - no odds restrictions&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;3.1.1 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase1sub1"&gt;Bookmaker predictions without threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;3.1.2 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase1sub2"&gt;Bookmaker predictions with threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;3.1.3 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase1sub3"&gt;Model predictions without threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;3.1.4 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase1sub4"&gt;Model predictions with threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3.2 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase2"&gt;Test case #2 - ignoring odds below 1.10&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;3.2.1 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase2sub1"&gt;Bookmaker predictions without threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;3.2.2 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase2sub2"&gt;Bookmaker predictions with threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;3.2.3 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase2sub3"&gt;Model predictions without threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;3.2.4 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#testcase2sub4"&gt;Model predictions with threshold selection&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#conclusion"&gt;Conclusion&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;4.1 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#somequestionsyoumightask"&gt;Some questions you might ask&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;4.2 &lt;a href="http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/#finalnote"&gt;Final note&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;1. Introduction &lt;a name="introduction"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Predicting sport events has always been a popular domain. Not only because of the degree of uncertainty and excitement but also due to possibility of winning money by betting. Soccer, the most popular sport in the world, remains an especially attractive topic for predicting matches outcomes.&lt;br&gt;
+&lt;br&gt;
+There are many works focusing on using classical approaches when predicting outcomes of the matches—using SVMs, trees, logistic regressions, NNs, etc. However, they usually do not respect the natural time ordering of the matches, since it might be actually quite problematic to properly grasp this concept.&lt;br&gt;
+&lt;br&gt; 
+In this post, I will be modeling the predictions as time series classification with use of neural networks in an unconventional way (to my best knowledge).  &lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;1.2 Framing the problem &lt;a name="framingtheproblem"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Predicting (forecasting) a value in the future is connected with many problems. The accuracy of prediction is influenced by several key factors—quality of historical data available, amount of historical data available, forecasted target horizon, available features, and of course the nature of problem itself.&lt;br&gt;
+&lt;br&gt;
+Time series forecasting differs from other ML approaches as there are often not enough data points. For example, when forecasting in a day’s timeframe, even if we have several years of historical data available, it is still mere hundreds or thousands of data points, a very small dataset, prompting many to dismiss it as NNs would not work on such small amount of data points. Further, if we increase the forecasting interval to weeks or months, then the number of data points decreases even more drastically.&lt;br&gt;
+&lt;br&gt;
+Generally speaking, time series also have another unique property; they are often non stationary. This means that their mean changes over time—they can be composed of seasonality, trends or cycles, etc. A once trained model probably will not work for a long period of time and will require to be retrained frequently.&lt;br&gt;
+&lt;br&gt;
+This suggests that forecasting can be quite tricky and difficult.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;1.3 What we are dealing with &lt;a name="whatwearedealingwith"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In summary, the key factors we need to deal with:  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Time series&lt;/strong&gt; – matches are naturally time ordered data points which sequence should be respected &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Imbalanced classes&lt;/strong&gt; – some teams are obviously more successful than others and win more frequently&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Small amount of data points&lt;/strong&gt; – we have only a hundred of data points for each team &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Highly aggregated data&lt;/strong&gt; – data we have does not capture detailed information about players, instead they capture aggregated information on team level basis&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Handful of features&lt;/strong&gt; – there are only several features available which may (not) be good predictors&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Irreducible errors&lt;/strong&gt; – there will always be an error which cannot be predicted, such as luck, coincidence, players’ health and mental condition or other factors  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;
+In order to frame the problem as time series we have to respect ordering of matches, which brings the question of how to make the model since we have many teams. I did not have much success with a single model trying to predict outcomes of matches for all teams. Instead, we will create a model for every single team separately which will be then trained simultaneously. This might sound crazy. However, it helps us to solve the problem of small amount of data points. If each model sees consecutive matches of its own team, then the need for large dataset is not that pressing. We would need a substantially more data points when using a single model (due to mixing all teams together) to be able to capture patterns between previous teams’ plays.&lt;br&gt;
+&lt;br&gt;
+To fight imbalanced classes, we will compute class weights for each team, which will be used to penalize loss for more occurring target classes during training. This is probably everything we can do here. We cannot use oversampling techniques if we want to keep the ordering of matches the same.&lt;br&gt;
+&lt;br&gt;
+To enhance model performance on available data, we would need to do more feature engineering. Otherwise, the only option is to get better data.&lt;br&gt;
+&lt;br&gt;
+Overcoming irreducible errors is quite problematic. To do so, we will make our task a bit easier by focusing on predicting only two outcomes—either win-or-draw or loss. This corresponds to betting on double chance (while omitting outcome of home or away team’s win).  &lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;2. Technical walkthrough &lt;a name="technicalwalkthrough"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;h3&gt;2.1 Dataset &lt;a name="dataset"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Dataset used for training consists of Premier League and Championship matches between seasons 13-14 and 17-18. We will focus on predicting Premier League matches from the last season only. Having data from lower league is extremely helpful in order to properly track performance of teams because some teams might get promoted or demoted each season. Still, there are only about &lt;code&gt;~200&lt;/code&gt; data points for each team playing in the last season. Also, some teams from Championship have only tens of data points but we cannot do anything about that.&lt;br&gt;
+&lt;br&gt;
+The dataset is split into three parts:  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Prediction dataset&lt;/strong&gt; - contains a single data point for each team which will be predicted&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Test dataset&lt;/strong&gt; - contains 10 data points for each team. Although it might seem as a low number compared to standard approaches, it should be enough to capture current patterns in teams’ performance (it equals to a time span of about 2-3 months)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Train dataset&lt;/strong&gt; - uses all remaining data points&lt;br&gt;
+&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Summary of leagues where each team played in:&lt;br&gt;
+&lt;a href="http://jkrusina.github.io/images/teams_seasons.png"&gt;&lt;img alt="Summary of leagues" src="http://jkrusina.github.io/images/teams_seasons.png"&gt;&lt;/a&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Full list of number of samples for each team in our dataset:  &lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Counter of dataset samples for each team:
+                    train test predict
+Arsenal             179    10   1
+Aston_Villa         160    -    -
+Barnsley            92     -    -
+Birmingham          184    -    -
+Blackburn           184    -    -
+Blackpool           92     -    -
+Bolton              138    -    -
+Bournemouth         195    10   1
+Brentford           140    -    -
+Brighton            215    10   1
+Bristol_City        92     -    -
+Burnley             195    10   1
+Burton              46     -    -
+Cardiff             176    -    -
+Charlton            138    -    -
+Chelsea             179    10   1
+Crystal_Palace      179    10   1
+Derby               189    -    -
+Doncaster           46     -    -
+Everton             179    10   1
+Fulham              178    -    -
+Huddersfield        214    10   1
+Hull                163    -    -
+Ipswich             186    -    -
+Leeds               184    -    -
+Leicester           187    10   1
+Liverpool           179    10   1
+Man_City            179    10   1
+Man_Utd             179    10   1
+Middlesbrough       179    -    -
+Millwall            92     -    -
+Milton_Keynes_Dons  46     -    -
+Newcastle           187    10   1
+Norwich             171    -    -
+Nottingham_Forest   184    -    -
+Preston             92     -    -
+QPR                 179    -    -
+Reading             187    -    -
+Rotherham           138    -    -
+Sheff_Wed           189    -    -
+Southampton         179    10   1
+Stoke               179    10   1
+Sunderland          152    -    -
+Swansea             179    10   1
+Tottenham           179    10   1
+Watford             195    10   1
+West_Brom           179    10   1
+West_Ham            179    10   1
+Wigan               140    -    -
+Wolves              138    -    -
+Yeovil              46     -    -
+&lt;/pre&gt;
+
+
+&lt;h3&gt;2.2 Features &lt;a name="features"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In the current state, mostly simple features are used as inputs. Some more advanced features, e.g. obtained by advanced feature engineering, would definitely be useful to incorporate.&lt;br&gt;
+&lt;br&gt;
+Following features are used:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Encoded features (as binary vectors):  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Team&lt;/strong&gt; – name of current team&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Opponent&lt;/strong&gt; – name of current team’s opponent&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Categorical features:  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;League&lt;/strong&gt; – Premier League (1) or Championship (0)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;As home&lt;/strong&gt; – whether current team plays as home (1) or not (0)  &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WD&lt;/strong&gt; - match outcome as win-or-draw (1) or loss (0)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Numerical features (scaled into (0,1) range):  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Season&lt;/strong&gt; – current season number&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Rating&lt;/strong&gt; – team’s performance rating&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Goals&lt;/strong&gt; - number of goals team shot&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Shots&lt;/strong&gt; – total number of shots&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Errors&lt;/strong&gt; – number of errors team made leading to a goal&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Red cards&lt;/strong&gt; - number of red cards team received&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Odds WD&lt;/strong&gt; – odds for win-or-draw (equal to odds 1X and X2 for double chance)  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Also, future values of some features are used as input. We can use them as input since they are known in advance to the target match:  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Future as home&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Future opponent&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Future odds WD&lt;/strong&gt;    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;
+The target variable is then a value of &lt;code&gt;Future WD&lt;/code&gt; feature, i.e. outcome of target match.&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;2.3 Architecture &lt;a name="architecture"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Each model consists of two heads – &lt;strong&gt;main head&lt;/strong&gt;, and &lt;strong&gt;head2&lt;/strong&gt;.&lt;br&gt;
+&lt;br&gt;
+Architecture of both heads is basically mirrored (except for final layer which belongs to the main head). Inputs are concatenated and fed into LSTM layer with 35 neurons. Output of LSTM is then fed into Dense layer with 15 neurons. Then, outputs from both Dense layers are concatenated and fed into final output Dense layer. The LSTMs are in stateful mode and use batch size of 1, i.e. we are using online learning. The intermediate Dense layers use ELU activation function, while the output Dense layer uses Softmax activation function with two output classes. The inputs are formed as fixed sliding windows of 40 timesteps (which equals to about a year of previous matches for given team). In theory, stateful LSTMs should be (ideally) able to capture some patterns between batches. Cross entropy is used as a loss function along with Adam optimizer with learning rate set to &lt;code&gt;3e-4&lt;/code&gt;.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/architecture.png"&gt;&lt;img alt="Architecture" src="http://jkrusina.github.io/images/architecture.png"&gt;&lt;/a&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Main head layers "belong" to team the model is created for. Head2 layers’ weights are dynamically set according to opponent of the current team. They are held fixed and only weights of the main head are updated. The weights used for head2 layers are copied from main head of the opponent’s model.  &lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+The network is relatively simple, yet seems effective. It might not be powerful enough to capture all possible relationships in the data but it will do okay for our case now. We cannot get too fancy here due to relatively small dataset. Making large network with many parameters would be counterproductive for us. The network has already about 9000 trainable parameters which can be quite a lot compared to the number of data points, but with usage of L2 regularization it still seems feasible. Also, we have to keep in mind that we are training many models at once and the total number of parameters will be multiplied by the number of models which will have impact on computational time and resources required.  &lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+In simple terms, you can think of the core idea as sticking two different networks together for every match, each network representing past performance of particular team, and deciding the outcome based on learned weights so far.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;2.4 Training &lt;a name="training"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;During training, the program loops over consecutive matches and trains models for both teams for each particular match. First, model of home team is trained, then model of away team is trained. This ensures that all models are trained simultaneously on matches exactly as they were historically played.  &lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Simplified schema of training:  &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/training.png"&gt;&lt;img alt="Training" src="http://jkrusina.github.io/images/training.png"&gt;&lt;/a&gt;  &lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;
+This is the basic procedure. But some more tweaks are used during training:  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Both models’ weights must be set before training any of the models in order to avoid using already updated weights when training a second model (the second model could capture some information about the match result). &lt;/li&gt;
+&lt;li&gt;Head2 layers are held fixed. However, the states of LSTM will be updated anyway and must be stored (and loaded when the team plays next match).&lt;/li&gt;
+&lt;li&gt;Models are not trained on current weights of other models. Instead, models are always operating with best weights of other models. This ensures that current model’s weights will not be impaired if some other model starts overfitting. Thus, each model keeps a snapshot of every other model’s best weights.&lt;/li&gt;
+&lt;li&gt;Performance of models is evaluated on test set after each epoch. If model’s performance improves then its weights are updated in every other model’s snapshot.&lt;/li&gt;
+&lt;li&gt;All models use the same initial weights, copied from the first model created. This keeps starting point of networks the same making learning of models more stable.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;
+Each network is encapsulated within its own session and graph to avoid making one enormous graph. Keras has problems with creating and maintaining lots of models inside one graph. The training (at least first batches) and saving/loading takes extremely long which makes debugging and testing absolutely impractical. We create some overhead due to constantly switching between sessions, graphs, setting and getting weights, but it is still faster.&lt;br&gt;
+&lt;br&gt;
+Basically, everything important is done manually, i.e. getting and setting weights via Keras &lt;code&gt;get_weights&lt;/code&gt;, &lt;code&gt;set_weights&lt;/code&gt; methods, saving weights as numpy files, training by using &lt;code&gt;train_on_batch&lt;/code&gt;, etc. Further, every interaction with the network itself must be done within its session and graph, e.g. by: &lt;code&gt;with session.as_default(), graph.as_default():&lt;/code&gt;. &lt;br&gt;
+&lt;br&gt;  &lt;/p&gt;
+&lt;p&gt;Example of training progress:  &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/tensorboard.png"&gt;&lt;img alt="Tensorboard" src="http://jkrusina.github.io/images/tensorboard.png"&gt;&lt;/a&gt;  &lt;/p&gt;
+&lt;p&gt;&lt;br&gt; 
+Due to dependency on other models’ weights, online learning and the nature of problem, the loss and accuracy curves might be a lot jumpier than you would usually see. Also, it should not be expected to see loss going near zero.&lt;br&gt;
+&lt;br&gt; 
+There are two sets of metrics, one corresponds to the actual metrics logged and the other to the best metrics logged so far. For example, Arsenal’s model stops improving at epoch &lt;code&gt;~40&lt;/code&gt;. From that point on the model starts overfitting (test loss increases and test accuracy decreases). Thus, in order to prevent using a degraded performance of the model, only best weights recorded are used for prediction and when interacting with other models. The training of the model itself is not stopped because it is dependent on other models and its performance might still change.&lt;br&gt;
+&lt;br&gt; 
+A condition used to assess whether the model improved:  &lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;if (accuracy &amp;gt; best_accuracy) or (accuracy == best_accuracy and loss &amp;lt; best_loss)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Which means that either loss must decrease while accuracy remains same, or accuracy must increase regardless of whether the loss decreases or not.&lt;br&gt;
+&lt;br&gt; &lt;/p&gt;
+&lt;p&gt;Example of models’ performance on a test dataset:&lt;br&gt;
+&lt;br&gt; 
+&lt;a href="http://jkrusina.github.io/images/predictions.png"&gt;&lt;img alt="Predictions" src="http://jkrusina.github.io/images/predictions.png"&gt;&lt;/a&gt;&lt;br&gt;
+&lt;br&gt; 
+As you can see, model was able to capture performance of some teams decently, but not for every team. Part of wrong predictions does not directly result into a loss of bet—when a draw occurs. Draws are fairly common in soccer and thanks to betting on win-or-draw outcome then regardless of chosen team, we would still win the bet. This property along with the decision mechanism described in the next part helps us greatly mitigate risk when betting.&lt;br&gt;
+&lt;br&gt; &lt;/p&gt;
+&lt;p&gt;Reason of some predictions failing:&lt;br&gt;
+&lt;br&gt; 
+&lt;a href="http://jkrusina.github.io/images/visualization.png"&gt;&lt;img alt="Visualization" src="http://jkrusina.github.io/images/visualization.png"&gt;&lt;/a&gt;&lt;br&gt;
+&lt;br&gt; 
+In the first case, Arsenal made one error and lost by one goal. In the second case, Arsenal made two errors and lost by two goals. Such events are very hard to predict and are almost inevitable.&lt;br&gt;
+&lt;br&gt; &lt;/p&gt;
+&lt;p&gt;On a side note. It becomes hard to ensure reproducibility when training multiple models at once since every small variation in computation adds up during training and results might look very different. Although the full deterministic behavior is not usually expected from neural networks, it would be quite handy for this particular task, especially when testing different settings. Even when seeding every graph and operation the reproducibility is still not ensured. It might not even be possible due to constantly changing weights, using online training, managing multiple sessions and graph and/or other imprecisions during training. Hence, the models should be ideally retrained multiple times to get a more representative sample of performance, otherwise they may seem unstable. This is the biggest disadvantage encountered so far.  &lt;br&gt;
+&lt;br&gt; &lt;/p&gt;
+&lt;h3&gt;2.5 Picking a team &lt;a name="pickingateam"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;When training of models is finished, we need to pick a team to bet on. Since we are using a separate model for each team, we have two predictions for a single match. How to make decision then? We will select only those matches where both models agree on the result, i.e. model1 predicts 1 (win-or-draw) and model2 predicts 0 (loss), and vice versa. Other predictions (1-1, 0-0) are ignored.&lt;br&gt;
+&lt;br&gt;
+However, we want to be as “sure” as possible of the outcome because we will be betting on relatively low odds. There will be many cases where the predictions are just slightly above the decision threshold (0.5) and it would be still too risky to bet on them.&lt;br&gt;
+&lt;br&gt;
+So, to further ensure confidence in predictions, we will compute lowest prediction threshold which gives highest accuracy over the test set.  For example, if we achieve 100% accuracy on the test set with threshold above 90 %, then the same threshold will be used during forecasting for selecting matches to bet on.&lt;br&gt;
+&lt;br&gt;
+Also, some odds might be extremely low. In that case we may wish to ignore matches under a certain value of odds. Betting on them might not be worth the risk.  &lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;3. Testing and results &lt;a name="results"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Last 15 rounds of season 17-18 were selected as testing period (slightly less than half of season). Here “round” refers to number of matches for each team, i.e. 15 rounds mean that prediction was done on last 15 matches each team has played.&lt;br&gt;
+&lt;br&gt;
+Backtesting was done in a walk-forward manner. Meaning that 15 different iterations of training and testing were run, each time predicting only the next round.&lt;br&gt;
+&lt;br&gt;
+Due to non-determinism, the whole testing was repeated three times while selecting model with the best performance on the test dataset for each round. First criterion was to achieve highest accuracy, the second was to achieve highest positive net gain.&lt;br&gt;
+&lt;br&gt; 
+In order to compare models’ performance, the bookmaker predictions were chosen as a form of baseline. Thus, betting according to model, and betting according to the lowest odds given by the bookmaker (as they should represent the highest probability of the outcome) is compared. For simplicity, the bookmaker predictions were calculated as &lt;code&gt;1 / odds&lt;/code&gt;.&lt;br&gt;
+&lt;br&gt; 
+There were two test cases with four scenarios being tested in each of them:  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;No restriction of odds&lt;/strong&gt; – all odds values (except for 1.00) will be taken into account when selecting matches to bet on  &lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Bookmaker predictions without threshold selection&lt;/strong&gt; – no selection of matches based on probability threshold level for bookmaker predictions  &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Bookmaker predictions with threshold selection&lt;/strong&gt; – matches to bet on are narrowed down according to the best probability threshold on test set for bookmaker predictions  &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Model predictions without threshold selection&lt;/strong&gt; – no selection of matches based on probability threshold level for model predictions  &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Model predictions with threshold selection&lt;/strong&gt; – matches to bet on are narrowed down according to the best probability threshold on test set for model predictions  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Restricting odds&lt;/strong&gt; – odds under 1.10 will be omitted when selecting matches to bet on because the potential gain is negligible and not worth the risk  &lt;ul&gt;
+&lt;li&gt;The same four scenarios as above  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;
+It is useful to compare model predictions with bookmaker predictions in order to check whether the model has not learned just to copy the predictions according to the odds.&lt;br&gt;
+&lt;br&gt;
+In total there were 150 matches played across time span of 113 days.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;3.1 Test case #1 - no odds restrictions &lt;a name="testcase1"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;No odds restrictions are applied for the first test case.
+All four scenarios are tested.&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.1.1 Bookmaker predictions without threshold selection &lt;a name="testcase1sub1"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_bookmaker_withoutts_2018-01-20-2018-05-13_101.png"&gt;&lt;img alt="testcase1sub1" src="http://jkrusina.github.io/images/backtest_bookmaker_withoutts_2018-01-20-2018-05-13_101.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 149
+Total accuracy: 79.9%
+Average odds: 1.21
+Total net gain: -616.0%
+Total ROI: -4.1%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.1.2 Bookmaker predictions with threshold selection &lt;a name="testcase1sub2"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_bookmaker_2018-01-20-2018-05-13_101.png"&gt;&lt;img alt="testcase1sub2" src="http://jkrusina.github.io/images/backtest_bookmaker_2018-01-20-2018-05-13_101.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 14
+Total accuracy: 85.7%
+Average odds: 1.03
+Total net gain: -163.0%
+Total ROI: -11.6%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.1.3 Model predictions without threshold selection &lt;a name="testcase1sub3"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_model_withoutts_2018-01-20-2018-05-13_101.png"&gt;&lt;img alt="testcase1sub3" src="http://jkrusina.github.io/images/backtest_model_withoutts_2018-01-20-2018-05-13_101.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 65
+Total accuracy: 75.4%
+Average odds: 1.44
+Total net gain: 316.0%
+Total ROI: 4.9%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.1.4 Model predictions with threshold selection &lt;a name="testcase1sub4"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_model_2018-01-20-2018-05-13_101.png"&gt;&lt;img alt="testcase1sub4" src="http://jkrusina.github.io/images/backtest_model_2018-01-20-2018-05-13_101.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 41
+Total accuracy: 87.8%
+Average odds: 1.39
+Total net gain: 900.0%
+Total ROI: 22.0%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;3.2 Test case #2 - ignoring odds below 1.10 &lt;a name="testcase2"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All odds below 1.10 are omitted for the second test case.
+Again, all four scenarios are tested.&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.2.1 Bookmaker predictions without threshold selection &lt;a name="testcase2sub1"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_bookmaker_withoutts_2018-01-20-2018-05-13_11.png"&gt;&lt;img alt="testcase2sub1" src="http://jkrusina.github.io/images/backtest_bookmaker_withoutts_2018-01-20-2018-05-13_11.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 111
+Total accuracy: 76.6%
+Average odds: 1.27
+Total net gain: -386.0%
+Total ROI: -3.5%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.2.2 Bookmaker predictions with threshold selection &lt;a name="testcase2sub2"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_bookmaker_2018-01-20-2018-05-13_11.png"&gt;&lt;img alt="testcase2sub2" src="http://jkrusina.github.io/images/backtest_bookmaker_2018-01-20-2018-05-13_11.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 28
+Total accuracy: 75.0%
+Average odds: 1.19
+Total net gain: -324.0%
+Total ROI: -11.6%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.2.3 Model predictions without threshold selection &lt;a name="testcase2sub3"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_model_withoutts_2018-01-20-2018-05-13_11.png"&gt;&lt;img alt="testcase2sub3" src="http://jkrusina.github.io/images/backtest_model_withoutts_2018-01-20-2018-05-13_11.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 51
+Total accuracy: 72.5%
+Average odds: 1.55
+Total net gain: 463.0%
+Total ROI: 9.1%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;3.2.4 Model predictions with threshold selection &lt;a name="testcase2sub4"&gt;&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://jkrusina.github.io/images/backtest_model_2018-01-20-2018-05-13_11.png"&gt;&lt;img alt="testcase2sub4" src="http://jkrusina.github.io/images/backtest_model_2018-01-20-2018-05-13_11.png"&gt;&lt;/a&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;Total number of matches to bet on: 32
+Total accuracy: 90.6%
+Average odds: 1.49
+Total net gain: 1069.0%
+Total ROI: 33.4%
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;4. Conclusion &lt;a name="conclusion"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;As you can see, sticking to the lowest odds given by bookmaker leads eventually to a loss of money regardless of chosen betting strategy.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Contrarily, betting according to the model predictions leads to a profitable strategy. All tested scenarios resulted into a positive net gain and ROI regardless of chosen strategy. The highest profit achieved was &lt;code&gt;1069 %&lt;/code&gt; with prediction accuracy around &lt;code&gt;90 %&lt;/code&gt; and ROI &lt;code&gt;33.4 %&lt;/code&gt; over the tested period.&lt;br&gt;
+&lt;br&gt;
+From the total number of 150 matches, only 32 of them were selected to bet on (about every fifth match). This might seem like a low number, but our goal is to minimize risk and maximize profit, so a more conservative betting strategy yielding a steady profit is actually preferable.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;4.1 Some questions you might ask &lt;a name="somequestionsyoumightask"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Can it be profitable when run live?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In current state? I highly doubt it. Backtesting always looks better than live systems and I would not expect to see similar performance when live. However, the core idea might be promising and it is just a baseline of what could be done—some things are still heavily simplified. I am working on a much larger scale version with many improvements, will report later when finished on how it works/does not work.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Are the predictions just lucky?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Well, it is actually possible to a certain extent since the testing period is not that large. A much larger testing period would have to be used to find out. Even if the predictions were not obtained just by coincidence, some errors in predictions are inevitable, even when taking extra steps as precautions. The recovery from potential series of bet losses might be problematic due to betting on low odds stakes.&lt;br&gt;
+&lt;br&gt;
+Further, there is no guarantee that the program would keep the same performance quality in other seasons. Also, due to (not only) aforementioned instability there might not be any recognizable patterns, start of season might be difficult to predict, the program may not give any predictions that would meet the prespecified conditions, etc. &lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Can you share the dataset?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Unfortunately, no. Model relies on some proprietary features (namely rating and errors which turned out to be good predictors) which I will not share for obvious reasons. Also, it took a relatively lot of work to form and preprocess the dataset, so I would prefer not to share it for now. If you would like to test it out, you would have to put together your own. Some basic features can be scraped from many sites. Those sites offering juicier features are trickier to scrape, but it is definitely possible to scrape everything if you are dedicated.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Can you share the code?&lt;/strong&gt;  &lt;/p&gt;
+&lt;p&gt;Since I am not sharing the dataset, I decided to share the code instead. You may object that it is useless without the dataset but I wanted to share at least something.&lt;br&gt;
+&lt;br&gt;
+The full source code is available on my &lt;a href="https://github.com/jkrusina/SoccerPredictor"&gt;github&lt;/a&gt;. If you are interested, please check the repository. However, keep in mind that you will not be able to run the actual training without the dataset. So, please, take it mostly as an inspiration if you would like to build something similar or just to take a look how I implemented various things.&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;4.2 Final note &lt;a name="finalnote"&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Now, I am not saying that there are absolutely no errors in the code/concept which would make results look better than they should be. But I tried to make it as correctly as possible focusing on not introducing data leakage/lookahead bias with currently available data.&lt;br&gt;
+&lt;br&gt;
+However, one thing that I am aware of, which could have impact on the predictions, is that the models use closing odds. Here it becomes much more complicated. Although, closing and opening odds usually differ, odds a day before the match (for example) might not differ that much, especially for double chance. Also, they vary even between bookmakers.&lt;br&gt;
+&lt;br&gt;
+But the later odds might represent better information than opening odds. Which odds to use then? This would depend on how far ahead we would want to train models before the actual match. Another complication arises—the matches for single round are not played in one day, they are played even with several days apart from each other. This would require to train models several times in order to make things absolutely correctly.&lt;br&gt;
+&lt;br&gt;
+As I said, it quickly becomes a lot more complicated. So, for simplicity, the models currently use closing odds. Thus, the effect on predictions using closing odds is unknown so far and would have to be subject for substantially more testing. &lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;&lt;/div&gt;</description><guid>http://jkrusina.github.io/blog/predicting-soccer-matches-outcomes-with-machine-learning-as-time-series/</guid><pubDate>Sun, 08 Dec 2019 15:10:59 GMT</pubDate></item></channel></rss>
